@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Jadwal Shift - Mobile View</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* M3 Dark Purple Palette */
+            --md-sys-color-primary: #d0bcff; /* Light Purple / Lavender */
+            --md-sys-color-on-primary: #381e72;
+            --md-sys-color-primary-container: #4f378b;
+            --md-sys-color-on-primary-container: #eaddff;
+            --md-sys-color-surface: #1c1b1f; /* Dark Grey-Purple */
+            --md-sys-color-surface-container: #2b2930; /* Lighter Surface */
+            --md-sys-color-on-surface: #e6e1e5;
+            --md-sys-color-on-surface-variant: #cac4d0;
+            --md-sys-color-outline: #938f99;
+            --md-sys-color-icon-bg: #4f378b;
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            margin: 0;
+            padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        .carousel-viewport {
+            width: 85%;
+            overflow: hidden;
+            position: relative;
+            border-radius: 28px;
+            background-color: var(--md-sys-color-surface-container);
+            border: 1px solid rgba(208, 188, 255, 0.1);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+        }
+
+        .slide-card {
+            min-width: 100%;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .icon-large {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            background-color: var(--md-sys-color-icon-bg);
+            color: var(--md-sys-color-primary); 
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .indicators {
+            display: flex;
+            gap: 6px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--md-sys-color-outline);
+            transition: all 0.4s ease;
+            opacity: 0.4;
+        }
+
+        .dot.active {
+            width: 18px;
+            border-radius: 10px;
+            background: var(--md-sys-color-primary);
+            opacity: 1;
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(208, 188, 255, 0.1);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border-left-color: var(--md-sys-color-primary);
+            animation: spin 1s linear infinite;
+        }
+
+        .staff-name {
+            font-size: 1.125rem;
+            line-height: 1.75rem;
+            font-weight: 600;
+            color: var(--md-sys-color-on-surface);
+            letter-spacing: -0.01em;
+        }
+
+        .shift-label {
+            text-transform: uppercase;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            color: var(--md-sys-color-primary);
+            opacity: 0.6;
+            margin-bottom: 4px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        header {
+            margin-bottom: 1rem !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="mb-4 w-full text-center">
+            <p id="display-day-name" class="text-2xl font-bold text-[#d0bcff] uppercase tracking-[0.15em] mb-1">MEMUAT</p>
+            <h1 id="display-date-full" class="text-[11px] font-medium text-white/40 mb-2 tracking-[0.2em] uppercase">-- --- ----</h1>
+        </header>
+
+        <!-- Dynamic Content -->
+        <div id="loader" class="py-12 flex flex-col items-center">
+            <div class="loading-spinner"></div>
+            <p class="mt-4 text-[10px] tracking-widest text-[#d0bcff]/40 uppercase">Sinkronisasi Jadwal...</p>
+        </div>
+
+        <div id="main-content" class="hidden w-full flex flex-col items-center">
+            <div class="carousel-viewport">
+                <div class="carousel-track" id="carousel-track">
+                    <!-- Shift Pagi -->
+                    <div class="slide-card">
+                        <div class="icon-large">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925 4.128"/><path d="M13 22H4a2 2 0 0 1-2-2v-3a.5.5 0 0 1 .5-.5h2.472a2 2 0 0 0 1.789-1.105l.984-1.968A2 2 0 0 1 8.634 12.33a8.5 8.5 0 0 1 15.19 1.171 2 2 0 0 1-1.378 2.5l-2.071.492a2 2 0 0 0-1.428 1.428l-.492 2.07a2 2 0 0 1-2.5 1.379 2 2 0 0 1-1.17-1.17l-.786-1.571Z"/></svg>
+                        </div>
+                        <p class="shift-label">Shift Pagi</p>
+                        <h2 id="pagi-val" class="staff-name">--</h2>
+                    </div>
+
+                    <!-- Shift Siang -->
+                    <div class="slide-card">
+                        <div class="icon-large">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                        </div>
+                        <p class="shift-label">Shift Siang</p>
+                        <h2 id="siang-val" class="staff-name">--</h2>
+                    </div>
+
+                    <!-- Shift Malam -->
+                    <div class="slide-card">
+                        <div class="icon-large">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                        </div>
+                        <p class="shift-label">Shift Malam</p>
+                        <h2 id="malam-val" class="staff-name">--</h2>
+                    </div>
+
+                    <!-- Off -->
+                    <div class="slide-card">
+                        <div class="icon-large">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        </div>
+                        <p class="shift-label">Off / Libur</p>
+                        <h2 id="off-val" class="staff-name">--</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="indicators" id="indicators">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTtl3aDMYAvHX3ig2FDyZrXQ8AijzZAAjvm-5bImSqT5qhh5SDrxVMQK4e5LR7piQn6tOzXy5IFhV37/pub?output=csv';
+        let currentSelectedDate = new Date();
+        let currentSlide = 0;
+        let slideInterval;
+
+        function parseCSV(text) {
+            const rows = [];
+            let row = [];
+            let col = '';
+            let inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '"' && inQuotes && text[i+1] === '"') { col += '"'; i++; }
+                else if (char === '"') inQuotes = !inQuotes;
+                else if (char === ',' && !inQuotes) { row.push(col.trim()); col = ''; }
+                else if (char === '\n' && !inQuotes) { row.push(col.trim()); rows.push(row); row = []; col = ''; }
+                else col += char;
+            }
+            if (col || row.length > 0) { row.push(col.trim()); rows.push(row); }
+            return rows;
+        }
+
+        async function fetchData() {
+            const loader = document.getElementById('loader');
+            const mainContent = document.getElementById('main-content');
+            
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+            const dayName = days[currentSelectedDate.getDay()];
+            const dateStr = `${currentSelectedDate.getDate()} ${months[currentSelectedDate.getMonth()]} ${currentSelectedDate.getFullYear()}`;
+            
+            document.getElementById('display-day-name').textContent = dayName;
+            document.getElementById('display-date-full').textContent = dateStr;
+            
+            const y = currentSelectedDate.getFullYear();
+            const m = String(currentSelectedDate.getMonth() + 1).padStart(2, '0');
+            const d = String(currentSelectedDate.getDate()).padStart(2, '0');
+
+            const pattern = `${d}-${m}-${y}`;
+            const patternSimple = `${currentSelectedDate.getDate()}-${currentSelectedDate.getMonth()+1}-${y}`;
+
+            try {
+                const res = await fetch(`${CSV_URL}&v=${Date.now()}`);
+                const text = await res.text();
+                const rows = parseCSV(text);
+                
+                const match = rows.find(r => {
+                    const cell = r[1] ? r[1].trim() : '';
+                    return cell.includes(pattern) || cell === patternSimple;
+                });
+
+                if (match) {
+                    document.getElementById('pagi-val').textContent = match[2] || '-';
+                    document.getElementById('siang-val').textContent = match[3] || '-';
+                    document.getElementById('malam-val').textContent = match[4] || '-';
+                    document.getElementById('off-val').textContent = match[5] || '-';
+                    
+                    loader.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                    startAutoSlide();
+                } else {
+                    loader.innerHTML = `<p class="text-red-400 font-medium px-4 text-center text-xs">Jadwal hari ini tidak tersedia</p>`;
+                }
+            } catch (e) {
+                loader.innerHTML = `<p class="text-red-400 font-medium text-xs">Gagal sinkronisasi data</p>`;
+            }
+        }
+
+        function startAutoSlide() {
+            clearInterval(slideInterval);
+            currentSlide = 0;
+            updateSlide();
+            slideInterval = setInterval(() => {
+                currentSlide = (currentSlide + 1) % 4;
+                updateSlide();
+            }, 3000);
+        }
+
+        function updateSlide() {
+            const track = document.getElementById('carousel-track');
+            const dots = document.querySelectorAll('.dot');
+            if (track) track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+        }
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const viewport = document.querySelector('.carousel-viewport');
+        
+        viewport.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+            clearInterval(slideInterval);
+        });
+        
+        viewport.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) {
+                currentSlide = (currentSlide + 1) % 4;
+            } else if (touchEndX - touchStartX > 50) {
+                currentSlide = (currentSlide - 1 + 4) % 4;
+            }
+            updateSlide();
+            setTimeout(startAutoSlide, 5000);
+        });
+
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
+
