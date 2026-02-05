@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Jadwal Shift - Mobile View</title>
+    <title>Jadwal Shift - Vertical View</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* M3 Dark Purple Palette */
-            --md-sys-color-primary: #d0bcff; /* Light Purple / Lavender */
-            --md-sys-color-on-primary: #381e72;
-            --md-sys-color-primary-container: #4f378b;
-            --md-sys-color-on-primary-container: #eaddff;
-            --md-sys-color-surface: #1c1b1f; /* Dark Grey-Purple */
-            --md-sys-color-surface-container: #2b2930; /* Lighter Surface */
-            --md-sys-color-on-surface: #e6e1e5;
-            --md-sys-color-on-surface-variant: #cac4d0;
-            --md-sys-color-outline: #938f99;
-            --md-sys-color-icon-bg: #4f378b;
+            /* M3 Dark Blue Palette */
+            --md-sys-color-primary: #a8c7ff;
+            --md-sys-color-on-primary: #002f68;
+            --md-sys-color-primary-container: #004694;
+            --md-sys-color-on-primary-container: #d6e3ff;
+            --md-sys-color-surface: #1a1c1e;
+            --md-sys-color-surface-container: #222427;
+            --md-sys-color-on-surface: #e2e2e6;
+            --md-sys-color-on-surface-variant: #c3c6cf;
+            --md-sys-color-outline: #8d9199;
+            --md-sys-color-icon-bg: #004694;
         }
 
         * {
@@ -38,8 +38,7 @@
             flex-direction: column;
             min-height: 100vh;
             width: 100%;
-            overflow-x: hidden;
-            overflow-y: auto;
+            overflow: hidden;
         }
 
         .app-container {
@@ -54,48 +53,105 @@
             flex-grow: 1;
         }
 
+        /* Vertical Carousel Styles */
+        .content-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+            gap: 16px;
+        }
+
         .carousel-viewport {
-            width: 85%;
+            width: 80%;
+            height: 280px; /* Fixed height for vertical slide */
             overflow: hidden;
             position: relative;
-            border-radius: 28px;
+            border-radius: 32px;
             background-color: var(--md-sys-color-surface-container);
-            border: 1px solid rgba(208, 188, 255, 0.1);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(168, 199, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
         .carousel-track {
             display: flex;
-            transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+            flex-direction: column; /* Vertical direction */
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .slide-card {
-            min-width: 100%;
-            padding: 24px 16px;
+            min-height: 100%; /* Take full height of viewport */
+            width: 100%;
+            padding: 40px 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             text-align: center;
         }
 
+        /* Animated Icon */
         .icon-large {
-            width: 64px;
-            height: 64px;
-            border-radius: 20px;
+            width: 72px;
+            height: 72px;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             background-color: var(--md-sys-color-icon-bg);
             color: var(--md-sys-color-primary); 
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: scale(0.8);
+            opacity: 0.3;
         }
 
+        .slide-card.active .icon-large {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .slide-card.active svg {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .staff-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--md-sys-color-on-surface);
+            letter-spacing: -0.01em;
+            transform: translateY(10px);
+            opacity: 0;
+            transition: all 0.6s ease 0.2s;
+        }
+
+        .slide-card.active .staff-name {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .shift-label {
+            text-transform: uppercase;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            color: var(--md-sys-color-primary);
+            opacity: 0.5;
+            margin-bottom: 8px;
+        }
+
+        /* Vertical Indicator Dots */
         .indicators {
             display: flex;
-            gap: 6px;
-            margin-top: 20px;
-            justify-content: center;
+            flex-direction: column; /* Stack dots vertically */
+            gap: 10px;
         }
 
         .dot {
@@ -103,48 +159,35 @@
             height: 6px;
             border-radius: 50%;
             background: var(--md-sys-color-outline);
-            transition: all 0.4s ease;
-            opacity: 0.4;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0.3;
         }
 
         .dot.active {
-            width: 18px;
+            height: 20px; /* Expand vertically instead of horizontally */
             border-radius: 10px;
             background: var(--md-sys-color-primary);
             opacity: 1;
         }
 
         .loading-spinner {
-            border: 3px solid rgba(208, 188, 255, 0.1);
-            width: 32px;
-            height: 32px;
+            border: 3px solid rgba(168, 199, 255, 0.1);
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             border-left-color: var(--md-sys-color-primary);
-            animation: spin 1s linear infinite;
-        }
-
-        .staff-name {
-            font-size: 1.125rem;
-            line-height: 1.75rem;
-            font-weight: 600;
-            color: var(--md-sys-color-on-surface);
-            letter-spacing: -0.01em;
-        }
-
-        .shift-label {
-            text-transform: uppercase;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.25em;
-            color: var(--md-sys-color-primary);
-            opacity: 0.6;
-            margin-bottom: 4px;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
         header {
-            margin-bottom: 1rem !important;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -152,63 +195,66 @@
 
     <div class="app-container">
         <!-- Header Section -->
-        <header class="mb-4 w-full text-center">
-            <p id="display-day-name" class="text-2xl font-bold text-[#d0bcff] uppercase tracking-[0.15em] mb-1">MEMUAT</p>
-            <h1 id="display-date-full" class="text-[11px] font-medium text-white/40 mb-2 tracking-[0.2em] uppercase">-- --- ----</h1>
+        <header class="mb-8 w-full text-center">
+            <p id="display-day-name" class="text-3xl font-bold text-[#a8c7ff] uppercase tracking-[0.2em] mb-1">MEMUAT</p>
+            <h1 id="display-date-full" class="text-[12px] font-medium text-white/30 tracking-[0.25em] uppercase">-- --- ----</h1>
         </header>
 
         <!-- Dynamic Content -->
-        <div id="loader" class="py-12 flex flex-col items-center">
+        <div id="loader" class="py-16 flex flex-col items-center">
             <div class="loading-spinner"></div>
-            <p class="mt-4 text-[10px] tracking-widest text-[#d0bcff]/40 uppercase">Sinkronisasi Jadwal...</p>
+            <p class="mt-6 text-[11px] font-medium tracking-[0.3em] text-[#a8c7ff]/40 uppercase">Sinkronisasi Data</p>
         </div>
 
-        <div id="main-content" class="hidden w-full flex flex-col items-center">
-            <div class="carousel-viewport">
-                <div class="carousel-track" id="carousel-track">
-                    <!-- Shift Pagi -->
-                    <div class="slide-card">
-                        <div class="icon-large">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925 4.128"/><path d="M13 22H4a2 2 0 0 1-2-2v-3a.5.5 0 0 1 .5-.5h2.472a2 2 0 0 0 1.789-1.105l.984-1.968A2 2 0 0 1 8.634 12.33a8.5 8.5 0 0 1 15.19 1.171 2 2 0 0 1-1.378 2.5l-2.071.492a2 2 0 0 0-1.428 1.428l-.492 2.07a2 2 0 0 1-2.5 1.379 2 2 0 0 1-1.17-1.17l-.786-1.571Z"/></svg>
+        <div id="main-content" class="hidden w-full">
+            <div class="content-wrapper">
+                <div class="carousel-viewport">
+                    <div class="carousel-track" id="carousel-track">
+                        <!-- Shift Pagi -->
+                        <div class="slide-card active" data-index="0">
+                            <div class="icon-large">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925 4.128"/><path d="M13 22H4a2 2 0 0 1-2-2v-3a.5.5 0 0 1 .5-.5h2.472a2 2 0 0 0 1.789-1.105l.984-1.968A2 2 0 0 1 8.634 12.33a8.5 8.5 0 0 1 15.19 1.171 2 2 0 0 1-1.378 2.5l-2.071.492a2 2 0 0 0-1.428 1.428l-.492 2.07a2 2 0 0 1-2.5 1.379 2 2 0 0 1-1.17-1.17l-.786-1.571Z"/></svg>
+                            </div>
+                            <p class="shift-label">Shift Pagi</p>
+                            <h2 id="pagi-val" class="staff-name">--</h2>
                         </div>
-                        <p class="shift-label">Shift Pagi</p>
-                        <h2 id="pagi-val" class="staff-name">--</h2>
-                    </div>
 
-                    <!-- Shift Siang -->
-                    <div class="slide-card">
-                        <div class="icon-large">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                        <!-- Shift Siang -->
+                        <div class="slide-card" data-index="1">
+                            <div class="icon-large">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                            </div>
+                            <p class="shift-label">Shift Siang</p>
+                            <h2 id="siang-val" class="staff-name">--</h2>
                         </div>
-                        <p class="shift-label">Shift Siang</p>
-                        <h2 id="siang-val" class="staff-name">--</h2>
-                    </div>
 
-                    <!-- Shift Malam -->
-                    <div class="slide-card">
-                        <div class="icon-large">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                        <!-- Shift Malam -->
+                        <div class="slide-card" data-index="2">
+                            <div class="icon-large">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                            </div>
+                            <p class="shift-label">Shift Malam</p>
+                            <h2 id="malam-val" class="staff-name">--</h2>
                         </div>
-                        <p class="shift-label">Shift Malam</p>
-                        <h2 id="malam-val" class="staff-name">--</h2>
-                    </div>
 
-                    <!-- Off -->
-                    <div class="slide-card">
-                        <div class="icon-large">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        <!-- Off -->
+                        <div class="slide-card" data-index="3">
+                            <div class="icon-large">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                            </div>
+                            <p class="shift-label">Off / Libur</p>
+                            <h2 id="off-val" class="staff-name">--</h2>
                         </div>
-                        <p class="shift-label">Off / Libur</p>
-                        <h2 id="off-val" class="staff-name">--</h2>
                     </div>
                 </div>
-            </div>
 
-            <div class="indicators" id="indicators">
-                <div class="dot active"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
+                <!-- Vertical Indicators -->
+                <div class="indicators" id="indicators">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -243,28 +289,16 @@
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             
-            const dayName = days[currentSelectedDate.getDay()];
-            const dateStr = `${currentSelectedDate.getDate()} ${months[currentSelectedDate.getMonth()]} ${currentSelectedDate.getFullYear()}`;
+            document.getElementById('display-day-name').textContent = days[currentSelectedDate.getDay()];
+            document.getElementById('display-date-full').textContent = `${currentSelectedDate.getDate()} ${months[currentSelectedDate.getMonth()]} ${currentSelectedDate.getFullYear()}`;
             
-            document.getElementById('display-day-name').textContent = dayName;
-            document.getElementById('display-date-full').textContent = dateStr;
-            
-            const y = currentSelectedDate.getFullYear();
-            const m = String(currentSelectedDate.getMonth() + 1).padStart(2, '0');
-            const d = String(currentSelectedDate.getDate()).padStart(2, '0');
-
-            const pattern = `${d}-${m}-${y}`;
-            const patternSimple = `${currentSelectedDate.getDate()}-${currentSelectedDate.getMonth()+1}-${y}`;
+            const pattern = `${String(currentSelectedDate.getDate()).padStart(2, '0')}-${String(currentSelectedDate.getMonth() + 1).padStart(2, '0')}-${currentSelectedDate.getFullYear()}`;
 
             try {
                 const res = await fetch(`${CSV_URL}&v=${Date.now()}`);
                 const text = await res.text();
                 const rows = parseCSV(text);
-                
-                const match = rows.find(r => {
-                    const cell = r[1] ? r[1].trim() : '';
-                    return cell.includes(pattern) || cell === patternSimple;
-                });
+                const match = rows.find(r => r[1] && r[1].trim().includes(pattern));
 
                 if (match) {
                     document.getElementById('pagi-val').textContent = match[2] || '-';
@@ -276,49 +310,56 @@
                     mainContent.classList.remove('hidden');
                     startAutoSlide();
                 } else {
-                    loader.innerHTML = `<p class="text-red-400 font-medium px-4 text-center text-xs">Jadwal hari ini tidak tersedia</p>`;
+                    loader.innerHTML = `<p class="text-red-400 font-medium px-4 text-center text-xs">Jadwal tidak ditemukan</p>`;
                 }
             } catch (e) {
-                loader.innerHTML = `<p class="text-red-400 font-medium text-xs">Gagal sinkronisasi data</p>`;
+                loader.innerHTML = `<p class="text-red-400 font-medium text-xs">Gagal sinkronisasi</p>`;
             }
         }
 
         function startAutoSlide() {
             clearInterval(slideInterval);
-            currentSlide = 0;
-            updateSlide();
             slideInterval = setInterval(() => {
                 currentSlide = (currentSlide + 1) % 4;
                 updateSlide();
-            }, 3000);
+            }, 3500);
         }
 
         function updateSlide() {
             const track = document.getElementById('carousel-track');
             const dots = document.querySelectorAll('.dot');
-            if (track) track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            const slides = document.querySelectorAll('.slide-card');
+            
+            // Vertical translation using translateY
+            if (track) track.style.transform = `translateY(-${currentSlide * 100}%)`;
+            
             dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+            slides.forEach((slide, i) => slide.classList.toggle('active', i === currentSlide));
         }
 
-        let touchStartX = 0;
-        let touchEndX = 0;
+        // Vertical Swipe Logic
+        let touchStartY = 0;
+        let touchEndY = 0;
         const viewport = document.querySelector('.carousel-viewport');
         
         viewport.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
             clearInterval(slideInterval);
-        });
+        }, {passive: true});
         
         viewport.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            if (touchStartX - touchEndX > 50) {
-                currentSlide = (currentSlide + 1) % 4;
-            } else if (touchEndX - touchStartX > 50) {
-                currentSlide = (currentSlide - 1 + 4) % 4;
+            touchEndY = e.changedTouches[0].screenY;
+            const diff = touchStartY - touchEndY;
+            if (Math.abs(diff) > 40) {
+                if (diff > 0) {
+                    currentSlide = (currentSlide + 1) % 4;
+                } else {
+                    currentSlide = (currentSlide - 1 + 4) % 4;
+                }
+                updateSlide();
             }
-            updateSlide();
             setTimeout(startAutoSlide, 5000);
-        });
+        }, {passive: true});
 
         window.onload = fetchData;
     </script>
